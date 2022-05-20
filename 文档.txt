@@ -1,0 +1,23 @@
+1、下载 NODE JS
+2、
+
+安装npm
+
+下载 tinymce
+npm install --save tinymce/plugins
+
+https://blog.csdn.net/qq_42740164/article/details/118336792
+
+npm install tinymce --S 
+
+npm install @tinymce/tinymce-vue -S
+
+打包命令
+npm i -下载依赖
+
+npm run build 打包
+
+生成目录 dist下
+
+npm run start -运行
+

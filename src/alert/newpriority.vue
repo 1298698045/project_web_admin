@@ -1,0 +1,166 @@
+<template>
+<div class="container">
+    <el-dialog title="新建优先级" :visible.sync="show" top="50px">
+        <div class="popup">
+    <div class="popup-head">
+      <div class="popup-title">新建优先级</div>
+    </div>
+    <div class="popup-body">
+      <div class="body-main">
+        <div class="popup-form">
+          <el-form
+            :model="ruleForm"
+            :rules="rules"
+            ref="ruleForm"
+            label-position="top"
+            class="demo-ruleForm"
+          >
+            <el-form-item
+              label="名称"
+              prop="Subject"
+            >
+              <el-input style="width:232px"  ref="IssueType" v-model="ruleForm.IssueType"></el-input>
+            </el-form-item>
+            <el-form-item label="描述">
+              <el-input type="textarea" ref="Subject" v-model="ruleForm.Subject"></el-input>
+            </el-form-item>
+            
+            <el-form-item
+              label="图标URL"
+              prop="Subject"
+            >
+              <el-input style="width:232px"  ref="IssueType" v-model="ruleForm.IssueType"></el-input>
+            </el-form-item>
+            <el-form-item label="优先级颜色"
+             prop="Subject">
+               <el-color-picker v-model="ruleForm.color2"></el-color-picker>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+    </div>
+    <div class="popup-bottom">
+      <div class="popup-footer">
+      <el-button size="small" @click="submitForm('ruleForm')" type="primary">添加</el-button>
+      <el-button size="small" @click="closepopup">取消</el-button>
+    </div>
+    </div>
+    
+  </div>
+  </el-dialog>
+</div>
+  
+</template>
+<script>
+import commonapi from '@/api/commonapi.js'
+import researchelselect from '@/components/dropbtn/researchelselect.vue'
+import icon from "@/icon/icon.vue";
+import '@/style/popupstyle.css'
+export default {
+  inject:['reload'],
+  props:['value'],
+  components: {
+    researchelselect,icon
+  },
+  mounted() {
+  },
+  computed:{
+      show:{
+          get(){
+            return this.value
+          },
+          set(val){
+              this.$emit('input',val)
+          }
+      }
+  },
+  watch:{
+    
+  },
+  data() {
+    return {
+        index:0,
+        createdagain:false,
+      ruleForm: {
+        Subject:'',
+        ScheduledStart:'',
+        ScheduledEnd:'',
+        RegardingObjectId:{Id:''},
+        IssueType:'',
+        OwningUser:{Id:''},
+        "ActivityTypeCode":"4212",
+      },
+      rules: {
+        Subject: [{ required: true, message: "请输入事务标题", trigger: "blur" }],
+        RegardingObjectId:{
+          Id:[{ required: true, message: "请选择项目", trigger: "change" }]
+        } ,
+        ScheduledStart: [
+          {
+            required: true,
+            message: "请选择日期",
+            trigger: "change",
+          },
+        ],
+        ScheduledEnd: [
+          {
+            required: true,
+            message: "请选择时间",
+            trigger: "change",
+          },
+        ],
+      },
+      search:{RegardingObjectId:[],OwningUser:[],IssueType:[]},
+      select:{},
+      defaultdata:{RegardingObjectId:[]}
+    };
+  },
+  created(){
+    if(this.$route.params.projectname!=''){
+      this.defaultdata.RegardingObjectId.push({
+        ID:this.$route.query.id,
+        Name:this.$route.params.projectname
+      })
+      this.ruleForm.RegardingObjectId = {
+        Id:this.$route.query.id,
+        Name:this.$route.params.projectname
+      }
+    }
+    this.getdetail(4200)
+  },
+  methods: {
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          commonapi.entitysaverecord(this.ruleForm,4200).then(()=>{
+            if(!this.createdagain){
+              this.reload()
+            }else{
+              this.$message.success('创建成功')
+              this.ruleForm.Subject = ''
+              this.index++
+              this.$refs.Subject.focus()
+              this.$emit('created')
+            }
+          })
+        } else {
+          this.$message.error('请输入所有必填项')
+          return false;
+        }
+      });
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
+    },
+    closepopup() {
+        this.$emit('input',false)
+    },
+  },
+};
+</script>
+<style scoped>
+.popup-body{
+  border-bottom: 2px solid #dedede;
+  height: calc(95vh - 220px) !important;
+}
+</style>
